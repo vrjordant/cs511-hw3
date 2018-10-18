@@ -70,6 +70,17 @@ valueOf(Exp,Env) ->
                 false ->
                     valueOf(Exp3,Env)
             end
+		{letExp,Name,Val,In} ->
+			{id, _, Id} = Name,
+			valueOf(In, env:add(Env,Id,valueOf(Val,Env)));
+		{procExp, Name,Exp} ->
+			{id, _, Id}= Name,
+			{proc, Id, Exp, Env};
+		{appExp,ProcName,Val} ->
+			{proc, ProcExpName, ProcExp, ProcEnv} = valueOf(ProcName,Env),
+			ValExp = valueOf(Val,Env),
+			NameVal = {id,1,ProcExpName},
+			valueOf({letExp,NameVal, ValExp}, ProcEnv)
     end.
              
 
