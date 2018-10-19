@@ -1,3 +1,6 @@
+% Jordan Tantuico and Jared Hobbie
+% I pledge my honor that I have abided by the Stevens Honor System.
+
 -module(interp).
 -export([scanAndParse/1,runFile/1,runStr/1]).
 -include("types.hrl").
@@ -49,10 +52,11 @@ boolVal2Bool({bool, B}) ->
     B.
 
 -spec valueOf(expType(),envType()) -> valType().
+
 valueOf(Exp,Env) ->
     case Exp of 
-        %{num, Val} -> {num, Val};
-        %{bool, Val} -> {bool, Val};
+        {num, Val} -> {num, Val};
+        {bool, Val} -> {bool, Val};
         {numExp, {num, _, Val}} -> 
             {num, Val};
         {idExp ,{id , _, Val}} -> 
@@ -69,18 +73,18 @@ valueOf(Exp,Env) ->
                     valueOf(Exp2,Env);
                 false ->
                     valueOf(Exp3,Env)
-            end
+            end;
 		{letExp,Name,Val,In} ->
 			{id, _, Id} = Name,
 			valueOf(In, env:add(Env,Id,valueOf(Val,Env)));
-		{procExp, Name,Exp} ->
+		{procExp, Name,ProcExp} ->
 			{id, _, Id}= Name,
-			{proc, Id, Exp, Env};
+			{proc, Id, ProcExp, Env};
 		{appExp,ProcName,Val} ->
 			{proc, ProcExpName, ProcExp, ProcEnv} = valueOf(ProcName,Env),
 			ValExp = valueOf(Val,Env),
 			NameVal = {id,1,ProcExpName},
-			valueOf({letExp,NameVal, ValExp}, ProcEnv)
+			valueOf({letExp,NameVal, ValExp, ProcExp}, ProcEnv)
     end.
              
 
